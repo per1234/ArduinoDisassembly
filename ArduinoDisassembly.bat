@@ -15,18 +15,15 @@ if "%~3" neq "" call :PROCESSPARAMETER %3
 
 if "%sketchFolder%"=="" exit
 
-REM check if it is 64 bit Windows
-set defaultProgramFilesPath=%PROGRAMFILES%
-if "%PROGRAMFILES(x86)%" neq "" set defaultProgramFilesPath=%PROGRAMFILES(x86)%
-
 REM default values
-if "%arduinoPath%"=="" set arduinoPath=%defaultProgramFilesPath%\Arduino
+if "%arduinoPath%"=="" goto :defaultArduinoPath
+:defaultArduinoPathDone
 
 REM find the most recent build folder
 FOR /F %%X IN ('DIR "%TEMP%\build*.tmp" /a:d /B /O:-D') DO set buildPath=%TEMP%\%%X & GOTO :p
 :p
 
-REM for some reason I'm getting an extra space at the end of the path
+REM there is an extra space at the end of the path so trim it off
 CALL :TRIM buildPath %buildPath%
 
 REM get the filename of the .elf
@@ -34,13 +31,13 @@ FOR /F %%X IN ('DIR "%buildPath%\*.cpp.elf" /B /O:-D') DO set elfFilename=%%X & 
 :p2
 
 REM determine the sketch name
-REM for some reason I'm getting an extra space at the end of the filename so trim it off
+REM there is an extra space at the end of the filename so trim it off
 CALL :TRIM elfFilename %elfFilename%
 
 REM trim the .cpp.elf extension off
 set sketchName=%elfFilename:~0,-8%
 
-REM find the sketch folder - this isn't working so I am just assuming the sketch folder is immediately inside of the sketchFolder
+REM find the sketch folder
 FOR /F "delims=" %%X IN ('DIR "%sketchFolder%\%sketchName%?" /a:d /B /O:-D /s') DO set sketchPath="%%X" & goto :sketchPathFound
 :sketchPathFound
 
@@ -52,12 +49,9 @@ avr-objdump -I%sketchPath% -d -S -j .text "%buildPath%\%elfFilename%" > "%buildP
 
 REM open the text file in the editor
 REM no editor specified
-if "%editorPath%"=="" (
-"%buildPath%\disassembly.txt"
-goto :ENDBATCH
-)
+if "%editorPath%"=="" "%buildPath%\disassembly.txt" & goto :ENDBATCH
 
-REM if an editor is specied
+REM an editor is specied
 "%editorPath%" "%buildPath%\disassembly.txt"
 goto :ENDBATCH
 
@@ -79,6 +73,14 @@ goto :eof
 :paramEditor
 set editorPath=%parameter:~3%
 goto :eof
+
+REM determine the correct Program Files location
+:defaultArduinoPath
+set programFilesPath="%PROGRAMFILES%"
+REM check if it is 64 bit Windows
+if "%PROGRAMFILES(x86)%" neq "" set programFilesPath="%PROGRAMFILES(x86)%"
+set arduinoPath=%programFilesPath%\Arduino
+goto :defaultArduinoPathDone
 
 REM trims whitespace - does not work with strings that contains spaces but arduino doesn't allow spaces in filenames so it's ok
 :TRIM
@@ -106,19 +108,12 @@ echo				associated with .txt files will be used.
 echo(
 echo   /A:arduinoPath	(optional)Path to the folder where Arduino IDE is
 echo				installed. If this is not specified then the default
-echo				install folder will be used.
+echo				install folder will be used. This is only needed
+echo				for Arduino IDE versions < 1.6.2.
 echo(
 goto :ENDBATCH
 
 :ENDBATCH
 exit/b
 
-
-todo:
-
--the code for finding the sketch folder is not very good because it could match other folders with the same name or the same name with a character added. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
--documentation formatting - it needs tabs to line things up or something and more newlines
--post to github, 
--comment on the application monitor article - http://forum.arduino.cc/index.php?topic=152005.0 from IDE versio 1.0.2 onwards -I is required(https://github.com/arduino/Arduino/issues/1337) for source code from .ino file to appear in the dissassembly
--post on the arduino thread? - I might get yelled at for ressurecting old thread
-another option would be to configure platform.txt to run a batch file that copies the sketch file to the temp compile folder and then run avr-objdump with -I.
+REM note: the code for finding the sketch folder is not very good because it could match other folders with the same name or the same name with a character added. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
