@@ -9,10 +9,10 @@ The disassembly of your compiled sketch shows the assembly that the compiler has
 - You may find it useful to create a shortcut to the batch file with your parameters. If the parameter contains spaces then make sure to enclose it in double quotes.
 
 #### Usage
-Save the sketch and compile before running ArduinoDisassembly.
+Save the sketch and compile before running ArduinoDisassembly.  
 `ArduinoDisassembly "sketchFolder" [/A:"arduinoPath"] [/E:"textEditor"]`
 - Parameter: sketchFolder - Folder where your sketch folder is located. Usually this will be the sketchbook folder configured in your Arduino IDE preferences.
-- Parameter: /E:textEditor		- (optional)Path to the text editor you want to open the dissassembly output in. If an editor is not specified then the default program you have associated with .txt files will be used.
+- Parameter: /E:textEditor - (optional)Path to the text editor you want to open the dissassembly output in. If an editor is not specified then the default program you have associated with .txt files will be used.
 - Parameter: /A:arduinoPath	- (optional)Path to the folder where Arduino IDE is installed. If this is not specified then the default install folder will be used. This is only needed for Arduino IDE versions < 1.6.2.
 
 #### Related Programs
