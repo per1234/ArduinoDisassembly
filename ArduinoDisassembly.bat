@@ -26,6 +26,9 @@ for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\
 REM there is an extra space at the end of the path so trim it off
 call :trim buildPath %buildPath%
 
+REM Arduino IDE 1.6.6 moved the .elf to a sketch subfolder of the build folder
+if exist %buildPath%\sketch\ set buildPath=%buildPath%\sketch
+
 REM get the filename of the .elf
 for /f %%X in ('dir "%buildPath%\*.cpp.elf" /b /o:-d') do set elfFilename=%%X & goto :elfFileNameDone
 :elfFileNameDone
