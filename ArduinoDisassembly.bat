@@ -20,17 +20,23 @@ if "%arduinoPath%"=="" goto :defaultArduinoPath
 :defaultArduinoPathDone
 
 REM find the most recent build folder
-for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\%%X & goto :buildPathDone
-:buildPathDone
+for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\%%X & goto :buildFolderFound
+:buildFolderFound
 
 REM there is an extra space at the end of the path so trim it off
 call :trim buildPath %buildPath%
+if exist %buildPath%\*.elf goto :elfLocationFound
 
-REM Arduino IDE 1.6.6 moved the .elf to a sketch subfolder of the build folder
-if exist %buildPath%\sketch\ set buildPath=%buildPath%\sketch
+REM At some point in the development process of Arduino IDE 1.6.6 they moved the .elf to a sketch subfolder of the build folder but now it seems to be back in the root but now the extension is .ino.elf instead of .cpp.elf
+if exist %buildPath%\sketch\*.elf set buildPath=%buildPath%\sketch & goto :elfLocationFound
 
+echo ERROR: .elf not found
+pause
+exit
+
+:elfLocationFound
 REM get the filename of the .elf
-for /f %%X in ('dir "%buildPath%\*.cpp.elf" /b /o:-d') do set elfFilename=%%X & goto :elfFileNameDone
+for /f %%X in ('dir "%buildPath%\*.elf" /b /o:-d') do set elfFilename=%%X & goto :elfFileNameDone
 :elfFileNameDone
 
 REM determine the sketch name
