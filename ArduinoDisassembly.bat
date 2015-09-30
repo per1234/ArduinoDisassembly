@@ -51,6 +51,10 @@ REM note: the code for finding the sketch folder is not very good because it cou
 for /f "delims=" %%X in ('dir "%sketchFolder%\%sketchName%?" /a:d /b /o:-d /s') do set sketchPath="%%X" & goto :sketchPathDone
 :sketchPathDone
 
+REM check to see if there is a sketch in the sketchPath
+cd/d %sketchPath%
+if not exist *.ino echo WARNING: sketch not found
+
 REM do the dissassembly dump
 REM set the path to both of the possible locations of avr-objcopy(Arduino IDE 1.6.2 moved the location)
 path %arduinoPath%;%arduinoPath%\hardware\tools\avr\bin\;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin
