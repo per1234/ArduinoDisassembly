@@ -16,7 +16,7 @@ Save the sketch and compile before running ArduinoDisassembly.
 `ArduinoDisassembly "sketchFolder" [/A:"arduinoPath"] [/E:"textEditor"]`
 - Parameter: **sketchFolder** - Folder where your sketch folder is located. Usually this will be the sketchbook folder configured in your Arduino IDE preferences.
 - Parameter: **/E:textEditor** - (optional)Path to the text editor you want to open the dissassembly output in. If an editor is not specified then the default program you have associated with .txt files will be used.
-- Parameter: **/A:arduinoPath**	- (optional)Path to the folder where Arduino IDE is installed. If this is not specified then the default install folder will be used. This is only needed for Arduino IDE versions < 1.6.2.
+- Parameter: **/A:arduinoPath**	- (optional)Path to the folder where Arduino IDE is installed. If this is not specified then the default install folder will be used.
 
 
 #### Related Programs

@@ -15,10 +15,6 @@ if "%~3" neq "" call :processParameter %3
 
 if "%sketchFolder%"=="" echo Error: sketch folder must be specified & pause & goto :endBatch
 
-REM default values
-if "%arduinoPath%"=="" goto :defaultArduinoPath
-:defaultArduinoPathDone
-
 REM find the most recent build folder
 for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\%%X & goto :buildFolderFound
 :buildFolderFound
@@ -55,9 +51,15 @@ REM check to see if there is a sketch in the sketchPath
 cd/d %sketchPath%
 if not exist *.ino echo WARNING: sketch not found
 
+REM determine the correct Program Files location
+set programFilesPath="%PROGRAMFILES%"
+REM check if it is 64 bit Windows
+if "%PROGRAMFILES(x86)%" neq "" set programFilesPath="%PROGRAMFILES(x86)%"
+
+REM set the path to all the possible locations of avr-objcopy
+path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin
+
 REM do the dissassembly dump
-REM set the path to both of the possible locations of avr-objcopy(Arduino IDE 1.6.2 moved the location)
-path %arduinoPath%;%arduinoPath%\hardware\tools\avr\bin\;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin
 avr-objdump -I%sketchPath% -d -S -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
 
 REM open the text file in the editor
@@ -87,14 +89,6 @@ goto :eof
   set editorPath=%parameter:~3%
 goto :eof
 
-REM determine the correct Program Files location
-:defaultArduinoPath
-  set programFilesPath="%PROGRAMFILES%"
-  REM check if it is 64 bit Windows
-  if "%PROGRAMFILES(x86)%" neq "" set programFilesPath="%PROGRAMFILES(x86)%"
-  set arduinoPath=%programFilesPath%\Arduino
-goto :defaultArduinoPathDone
-
 REM trims whitespace - does not work with strings that contains spaces but arduino doesn't allow spaces in filenames so it's ok
 :trim
   SetLocal EnableDelayedExpansion
@@ -121,8 +115,7 @@ REM documentation is displayed via the /? switch or by running the batch file wi
   echo(
   echo   /A:arduinoPath	(optional)Path to the folder where Arduino IDE is
   echo				installed. If this is not specified then the default
-  echo				install folder will be used. This is only needed for
-  echo				Arduino IDE versions older than 1.6.2.
+  echo				install folder will be used.
   echo(
   pause
 goto :endBatch
