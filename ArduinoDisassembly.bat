@@ -3,17 +3,12 @@ REM ArduinoDisassembly dumps disassembly of the last compiled arduino sketch and
 
 REM handle parameters
 
-REM no arguments so exit
-if "%~1"=="" echo Error: sketch folder must be specified & goto :documentation
-
 REM display documentation
 if "%~1"=="/?" goto :documentation
 
-call :processParameter %1
+if "%~1" neq "" call :processParameter %1
 if "%~2" neq "" call :processParameter %2
 if "%~3" neq "" call :processParameter %3
-
-if "%sketchFolder%"=="" echo Error: sketch folder must be specified & pause & goto :endBatch
 
 REM find the most recent build folder
 for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\%%X & goto :buildFolderFound
@@ -42,6 +37,17 @@ call :trim elfFilename %elfFilename%
 REM trim the .cpp.elf extension off
 set sketchName=%elfFilename:~0,-8%
 
+REM determine the correct Program Files location
+set programFilesPath="%PROGRAMFILES%"
+REM check if it is 64 bit Windows
+if "%PROGRAMFILES(x86)%" neq "" set programFilesPath="%PROGRAMFILES(x86)%"
+
+REM set the path to all the possible locations of avr-objcopy
+path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin
+
+if "%sketchFolder%"=="" goto :noSketchFolder
+echo %sketchFolder%
+pause
 REM find the sketch folder
 REM note: the code for finding the sketch folder is not very good because it could match other folders with the same name or the same name with a character added. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
 for /f "delims=" %%X in ('dir "%sketchFolder%\%sketchName%?" /a:d /b /o:-d /s') do set sketchPath="%%X" & goto :sketchPathDone
@@ -51,19 +57,15 @@ REM check to see if there is a sketch in the sketchPath
 cd/d %sketchPath%
 if not exist *.ino echo WARNING: sketch not found
 
-REM determine the correct Program Files location
-set programFilesPath="%PROGRAMFILES%"
-REM check if it is 64 bit Windows
-if "%PROGRAMFILES(x86)%" neq "" set programFilesPath="%PROGRAMFILES(x86)%"
-
-REM set the path to all the possible locations of avr-objcopy
-path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin
-
 REM do the dissassembly dump
 avr-objdump -I%sketchPath% -d -S -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
+goto :dumpFinished
 
+:noSketchFolder
+avr-objdump -d -S -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
+
+:dumpFinished
 REM open the text file in the editor
-REM no editor specified
 if "%editorPath%"=="" "%buildPath%\disassembly.txt" & goto :endBatch
 
 REM an editor is specied
@@ -73,12 +75,16 @@ goto :endBatch
 
 :processParameter
   set parameter=%~1
+  if %parameter:~0,3%==/s: goto :paramSketchFolder
+  if %parameter:~0,3%==/S: goto :paramSketchFolder
   if %parameter:~0,3%==/a: goto :paramArduino
   if %parameter:~0,3%==/A: goto :paramArduino
   if %parameter:~0,3%==/e: goto :paramEditor
   if %parameter:~0,3%==/E: goto :paramEditor
+goto :eof
 
-  set sketchFolder=%parameter%
+:paramSketchFolder
+  set sketchFolder=%parameter:~3%
 goto :eof
 
 :paramArduino
@@ -98,27 +104,28 @@ goto :eof
 
 REM documentation is displayed via the /? switch or by running the batch file without parameters
 :documentation
-  echo(
-  echo Dumps disassembly of the last compiled Arduino sketch and opens it in a
-  echo text editor. Save the sketch and compile before running this batch file.
-  echo(
-  echo ArduinoDisassembly "sketchFolder" [/A:"arduinoPath"] [/E:"textEditor"]
-  echo(
-  echo   sketchFolder		Folder where your sketch folder is located. Usually
-  echo				this will be the sketchbook folder configured
-  echo				in your Arduino IDE preferences.
-  echo(
-  echo   /E:textEditor		(optional)Path to the text editor you want to open
-  echo				the dissassembly output in. If an editor is not
-  echo				specified then the default program you have
-  echo				associated with .txt files will be used.
-  echo(
-  echo   /A:arduinoPath	(optional)Path to the folder where Arduino IDE is
-  echo				installed. If this is not specified then the default
-  echo				install folder will be used.
-  echo(
-  pause
+echo(
+echo Dumps disassembly of the last compiled Arduino sketch and opens it in a
+echo text editor. Save the sketch and compile before running this batch file.
+echo(
+echo ArduinoDisassembly [/S:"sketchFolder"] [/A:"arduinoPath"] [/E:"textEditor"]
+echo(
+echo   /S:sketchFolder	(optional)Folder where your sketch folder is located.
+echo				Usually this will be the sketchbook folder configured
+echo				in your Arduino IDE preferences. Only required for
+echo				Arduino IDE versions 1.0.2 - 1.6.5r5.
+echo(
+echo   /E:textEditor		(optional)Path to the text editor you want to open
+echo				the dissassembly output in. If an editor is not
+echo				specified then the default program you have
+echo				associated with .txt files will be used.
+echo(
+echo   /A:arduinoPath	(optional)Path to the folder where Arduino IDE is
+echo				installed. If this is not specified then the default
+echo				install folder will be used.
+echo(
+pause
 goto :endBatch
 
 :endBatch
-  exit/b
+exit/b
