@@ -23,3 +23,7 @@ If any parameter contains spaces then make sure to enclose it in double quotes.
 #### Related Programs
 - WatchdogLog: https://github.com/per1234/WatchdogLog - reports the program address where the most recent watchdog timeout occurred.
 - ApplicationMonitor: http://www.megunolink.com/how-to-detect-lockups-using-the-arduino-watchdog - reports the program addresses where a watchdog timeout occurred.
+
+
+#### Contributing
+Pull requests or issue reports are welcome! Please see the [contribution rules](https://github.com/per1234/ArduinoDisassembly/blob/master/CONTRIBUTING.md) for instructions.
