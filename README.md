@@ -1,5 +1,5 @@
 # ArduinoDisassembly
-Windows batch file that displays disassembly of the last compiled [Arduino](http://arduino.cc) sketch with source code.
+Windows batch file that displays disassembly of the last compiled [Arduino](http://arduino.cc) sketch with source code. NOTE: this is only for use with AVR boards (Uno, Mega, Leonardo, etc.).
 
 The disassembly of your compiled sketch shows the assembly that the compiler has created from your code. This can be useful for optimization and debugging. With Arduino IDE versions 1.0.2 up to and including 1.6.5r5 source code from the sketch is not included in the disassembly without pointing avr-objdump to the sketch folder. This batch file automates the process.
 
