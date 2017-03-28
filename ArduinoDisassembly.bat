@@ -69,11 +69,11 @@ cd/d %sketchPath%
 if not exist *.ino echo WARNING: sketch not found
 
 REM do the dissassembly dump
-avr-objdump -I%sketchPath% -d -S -l -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
+avr-objdump -I%sketchPath% -d -S -l -C -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
 goto :dumpFinished
 
 :noSketchFolder
-avr-objdump -d -S -l -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
+avr-objdump -d -S -l -C -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
 
 :dumpFinished
 REM open the text file in the editor
