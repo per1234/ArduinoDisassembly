@@ -13,6 +13,7 @@ The disassembly of your compiled sketch shows the assembly that the compiler has
 #### Usage
 Save the sketch and compile before running ArduinoDisassembly.
 If any parameter contains spaces then make sure to enclose it in double quotes.
+NOTE: Intermixed source code is not possible with Arduino AVR Boards 1.6.12-1.6.15. This was fixed in newer versions by the [addition of the -g compiler flag](https://github.com/arduino/Arduino/commit/35e45c9fe09279e1d5736032dad2dc892e35b6fe).
 
 **`ArduinoDisassembly ["sketchFolder"] [/A:"arduinoPath"] [/E:"textEditor"]`**
 - Parameter: **sketchFolder** - (optional)Folder where your sketch folder is located. Usually this will be your sketchbook configured in **File > Preferences > Sketchbook location:**. This is required for the sketch source code to appear in the disassembly when using Arduino IDE versions 1.0.2 up to and including 1.6.5r5.
