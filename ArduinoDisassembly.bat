@@ -1,11 +1,9 @@
 @echo off
 REM ArduinoDisassembly dumps disassembly of the last compiled arduino sketch and opens it in a text editor - ArduinoDissassembly /? for usage and instructions
+REM https://github.com/per1234/ArduinoDisassembly
 
 REM handle parameters
-
-REM display documentation
 if "%~1"=="/?" goto :documentation
-
 if "%~1" neq "" call :processParameter %1
 if "%~2" neq "" call :processParameter %2
 if "%~3" neq "" call :processParameter %3
@@ -16,25 +14,30 @@ for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\
 
 REM there is an extra space at the end of the path so trim it off
 call :trim buildPath %buildPath%
+
+REM Check if the .elf file is located in the root of the build folder
 if exist %buildPath%\*.elf goto :elfLocationFound
 
-REM At some point in the development process of Arduino IDE 1.6.6 they moved the .elf to a sketch subfolder of the build folder but now it seems to be back in the root but now the extension is .ino.elf instead of .cpp.elf
+REM at some point in the development process of Arduino IDE 1.6.6 they moved the .elf to a sketch subfolder of the build folder but now it seems to be back in the root but now the extension is .ino.elf instead of .cpp.elf
 if exist %buildPath%\sketch\*.elf set buildPath=%buildPath%\sketch & goto :elfLocationFound
 
+REM the .elf file was not in either of the known locations
 echo ERROR: .elf not found
 pause
-exit
+goto :endBatch
 
 :elfLocationFound
+
 REM get the filename of the .elf
-for /f %%X in ('dir "%buildPath%\*.elf" /b /o:-d') do set elfFilename=%%X & goto :elfFileNameDone
-:elfFileNameDone
+for /f %%X in ('dir "%buildPath%\*.elf" /b /o:-d') do set elfFilename=%%X & goto :elfFileNameFound
+:elfFileNameFound
 
 REM determine the sketch name
+
 REM there is an extra space at the end of the filename so trim it off
 call :trim elfFilename %elfFilename%
 
-REM trim the .cpp.elf extension off
+REM trim the .cpp.elf/.ino.elf extension off
 set sketchName=%elfFilename:~0,-8%
 
 REM determine the correct Program Files location
@@ -46,8 +49,6 @@ REM set the path to all the possible locations of avr-objcopy
 path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin
 
 if "%sketchFolder%"=="" goto :noSketchFolder
-echo %sketchFolder%
-pause
 REM find the sketch folder
 REM note: the code for finding the sketch folder is not very good because it could match other folders with the same name or the same name with a character added. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
 for /f "delims=" %%X in ('dir "%sketchFolder%\%sketchName%?" /a:d /b /o:-d /s') do set sketchPath="%%X" & goto :sketchPathDone
@@ -68,7 +69,7 @@ avr-objdump -d -S -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembl
 REM open the text file in the editor
 if "%editorPath%"=="" "%buildPath%\disassembly.txt" & goto :endBatch
 
-REM an editor is specied
+REM an editor is specified
 "%editorPath%" "%buildPath%\disassembly.txt"
 goto :endBatch
 
@@ -124,7 +125,6 @@ echo   /A:arduinoPath	(optional)Path to the folder where Arduino IDE is
 echo				installed. If this is not specified then the default
 echo				install folder will be used.
 echo(
-pause
 goto :endBatch
 
 :endBatch
