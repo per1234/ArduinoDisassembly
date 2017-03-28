@@ -9,8 +9,18 @@ if "%~2" neq "" call :processParameter %2
 if "%~3" neq "" call :processParameter %3
 
 REM find the most recent build folder
-for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildPath=%TEMP%\%%X & goto :buildFolderFound
+for /f %%X in ('dir "%TEMP%\arduino_build_*" /a:d /b /o:-d') do set buildFolder=%%X & goto :arduino_buildFolderSearchFinished
+:arduino_buildFolderSearchFinished
+if "%buildFolder%" neq "" goto :buildFolderFound
+REM the build folder name is different previous to Arduino IDE 1.6.12
+for /f %%X in ('dir "%TEMP%\build*.tmp" /a:d /b /o:-d') do set buildFolder=%%X & goto :buildFolderFound
+if "%buildFolder%" neq "" goto :buildFolderFound
+REM a folder was not found matching either of the known build folder names
+echo ERROR: Build folder not found
+pause
+goto :endBatch
 :buildFolderFound
+set buildPath=%TEMP%\%buildFolder%
 
 REM there is an extra space at the end of the path so trim it off
 call :trim buildPath %buildPath%
