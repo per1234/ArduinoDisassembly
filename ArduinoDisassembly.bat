@@ -61,7 +61,8 @@ if "%PROGRAMFILES(x86)%" neq "" set programFilesPath="%PROGRAMFILES(x86)%"
 
 REM set the path to all the possible locations of avr-objcopy
 set previousPath=%PATH%
-path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin
+if "%arduinoPath%" neq "" path %PATH%;%arduinoPath%\hardware\tools\avr\bin\
+path %PATH%;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin
 
 if "%sketchFolder%"=="" goto :sketchPathOptionDone
 REM find the sketch folder
