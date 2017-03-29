@@ -1,4 +1,5 @@
-@echo off
+@set debug=false
+@if %debug%==false @echo off
 REM ArduinoDisassembly dumps disassembly of the last compiled arduino sketch and opens it in a text editor - ArduinoDissassembly /? for usage and instructions
 REM https://github.com/per1234/ArduinoDisassembly
 
@@ -142,4 +143,5 @@ echo(
 goto :endBatch
 
 :endBatch
+if %debug%==true pause
 exit/b
