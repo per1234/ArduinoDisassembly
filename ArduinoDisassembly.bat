@@ -1,6 +1,6 @@
 @set debug=false
 @if %debug%==false @echo off
-REM ArduinoDisassembly dumps disassembly of the last compiled arduino sketch and opens it in a text editor - ArduinoDissassembly /? for usage and instructions
+REM ArduinoDisassembly dumps disassembly of the last compiled Arduino sketch and opens it in a text editor - ArduinoDissassembly /? for usage and instructions
 REM https://github.com/per1234/ArduinoDisassembly
 
 REM handle parameters
@@ -30,7 +30,10 @@ REM Check if the .elf file is located in the root of the build folder
 if exist %buildPath%\*.elf goto :elfLocationFound
 
 REM at some point in the development process of Arduino IDE 1.6.6 they moved the .elf to a sketch subfolder of the build folder but now it seems to be back in the root but now the extension is .ino.elf instead of .cpp.elf
-if exist %buildPath%\sketch\*.elf set buildPath=%buildPath%\sketch & goto :elfLocationFound
+if exist %buildPath%\sketch\*.elf (
+  set buildPath=%buildPath%\sketch
+  goto :elfLocationFound
+)
 
 REM the .elf file was not in either of the known locations
 echo ERROR: .elf not found
@@ -84,7 +87,10 @@ REM reset the path
 path %previousPath%
 
 REM open the text file in the editor
-if "%editorPath%"=="" "%buildPath%\disassembly.txt" & goto :endBatch
+if "%editorPath%"=="" (
+  "%buildPath%\disassembly.txt"
+  goto :endBatch
+)
 
 REM an editor is specified
 "%editorPath%" "%buildPath%\disassembly.txt"
@@ -113,7 +119,7 @@ goto :eof
   set editorPath=%parameter:~3%
 goto :eof
 
-REM trims whitespace - does not work with strings that contains spaces but arduino doesn't allow spaces in filenames so it's ok
+REM trims whitespace - does not work with strings that contains spaces but Arduino doesn't allow spaces in filenames so it's ok
 :trim
   SetLocal EnableDelayedExpansion
   set Params=%*
@@ -146,4 +152,4 @@ goto :endBatch
 
 :endBatch
 if %debug%==true pause
-exit/b
+exit /b
