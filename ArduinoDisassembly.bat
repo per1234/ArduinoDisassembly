@@ -60,7 +60,7 @@ REM set the path to all the possible locations of avr-objcopy
 set previousPath=%PATH%
 path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\hardware\tools\avr\bin\;%programFilesPath%\arduino-nightly\hardware\tools\avr\bin\;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%LOCALAPPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.9.2-atmel3.5.3-arduino2\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino5\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino3\bin;%APPDATA%\Arduino15\packages\arduino\tools\avr-gcc\4.8.1-arduino2\bin
 
-if "%sketchFolder%"=="" goto :noSketchFolder
+if "%sketchFolder%"=="" goto :sketchPathOptionDone
 REM find the sketch folder
 REM note: the code for finding the sketch folder is not very good because it could match other folders with the same name. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
 for /f "delims=" %%X in ('dir %sketchFolder%\%sketchName% /a:d /b /o:-d /s') do set sketchPath="%%X" & goto :sketchPathDone
@@ -69,16 +69,17 @@ REM trim the extra space from the end of sketchPath
 call :trim sketchPath %sketchPath%
 
 REM check to see if there is a sketch in the sketchPath
-if not exist %sketchPath%\%sketchName%.ino echo WARNING: sketch not found
+if not exist %sketchPath%\%sketchName%.ino (
+  echo WARNING: sketch not found
+  goto :sketchPathOptionDone
+)
 
-REM do the dissassembly dump
-avr-objdump -I%sketchPath% -d -S -l -C -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
-goto :dumpFinished
+REM the sketch path is valid
+set sketchPathOption=-I%sketchPath%
 
-:noSketchFolder
-avr-objdump -d -S -l -C -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
+:sketchPathOptionDone
+avr-objdump %sketchPathOption% -d -S -l -C -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
 
-:dumpFinished
 REM reset the path
 path %previousPath%
 
