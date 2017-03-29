@@ -62,13 +62,14 @@ path %PATH%;%arduinoPath%\hardware\tools\avr\bin\;%programFilesPath%\Arduino\har
 
 if "%sketchFolder%"=="" goto :noSketchFolder
 REM find the sketch folder
-REM note: the code for finding the sketch folder is not very good because it could match other folders with the same name or the same name with a character added. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
-for /f "delims=" %%X in ('dir "%sketchFolder%\%sketchName%?" /a:d /b /o:-d /s') do set sketchPath="%%X" & goto :sketchPathDone
+REM note: the code for finding the sketch folder is not very good because it could match other folders with the same name. It sorts the most recent but that only works within a given folder, the recursive search goes through subfolders in alphabetical order and then it takes the first match
+for /f "delims=" %%X in ('dir %sketchFolder%\%sketchName% /a:d /b /o:-d /s') do set sketchPath="%%X" & goto :sketchPathDone
 :sketchPathDone
+REM trim the extra space from the end of sketchPath
+call :trim sketchPath %sketchPath%
 
 REM check to see if there is a sketch in the sketchPath
-cd/d %sketchPath%
-if not exist *.ino echo WARNING: sketch not found
+if not exist %sketchPath%\%sketchName%.ino echo WARNING: sketch not found
 
 REM do the dissassembly dump
 avr-objdump -I%sketchPath% -d -S -l -C -j .text "%buildPath%\%elfFilename%" > "%buildPath%\disassembly.txt"
