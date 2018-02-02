@@ -18,7 +18,7 @@ NOTE: Intermixed source code is not possible with Arduino AVR Boards 1.6.12-1.6.
 **`ArduinoDisassembly ["sketchFolder"] [/A:"arduinoPath"] [/E:"textEditor"]`**
 - Parameter: **sketchFolder** - (optional) Folder where your sketch folder is located. Usually this will be your sketchbook configured in **File > Preferences > Sketchbook location:**. This is required for the sketch source code to be intermixed with the disassembly when using Arduino IDE versions 1.0.2 up to and including 1.6.5-r5. This option should not be used with IDE versions outside that range.
 - Parameter: **/E:textEditor** - (optional) Path to the text editor you want to open the disassembly output in. If an editor is not specified then the default program you have associated with .txt files will be used.
-- Parameter: **/A:arduinoPath**	- (optional) Path to the folder where Arduino IDE is installed. This is used to locate avr-objdump. If this is not specified then the batch file will attempt to find avr-objdump in the standard locations.
+- Parameter: **/A:arduinoPath** - (optional) Path to the folder where Arduino IDE is installed. This is used to locate avr-objdump. If this is not specified then the batch file will attempt to find avr-objdump in the standard locations.
 
 
 #### Contributing
