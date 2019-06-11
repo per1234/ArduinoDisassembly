@@ -22,4 +22,4 @@ NOTE: Intermixed source code is not possible with Arduino AVR Boards 1.6.12-1.6.
 
 
 #### Contributing
-Pull requests or issue reports are welcome! Please see the [contribution rules](https://github.com/per1234/ArduinoDisassembly/blob/master/CONTRIBUTING.md) for instructions.
+Pull requests or issue reports are welcome! Please see the [contribution rules](https://github.com/per1234/ArduinoDisassembly/blob/master/.github/CONTRIBUTING.md) for instructions.
