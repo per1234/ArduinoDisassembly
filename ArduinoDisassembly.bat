@@ -141,7 +141,7 @@ echo				in your Arduino IDE preferences. Only required for
 echo				Arduino IDE versions 1.0.2 - 1.6.5r5.
 echo(
 echo   /E:textEditor		(optional)Path to the text editor you want to open
-echo				the dissassembly output in. If an editor is not
+echo				the disassembly output in. If an editor is not
 echo				specified then the default program you have
 echo				associated with .txt files will be used.
 echo(
